@@ -11,7 +11,7 @@
 | `.pi/extensions/event-logger.ts` | Extension that logs events to disk |
 | `.pi/events.log` | Append-only log output (created at runtime) |
 | `.pi/AGENTS.md` | Project instructions for Pi |
-| `miscelaneous_documentation/explore-discover/01-extension-discovery-and-loading.md` | Prior research on how Pi loads extensions |
+| `documented_lessons/01-extension-discovery-and-loading.md` | Prior research on how Pi loads extensions |
 
 ---
 
@@ -150,8 +150,8 @@ Confirmed: the extension auto-loads from `.pi/extensions/`, the factory runs, th
 |------|-------|---------|
 | `.pi/extensions/event-logger.ts` | 54 | Extension: log helper + `session_start` handler with educational comments |
 | `.pi/events.log` | 6 | Runtime output: one event captured (appended on each Pi run) |
-| `miscelaneous_documentation/explore-discover/01-extension-discovery-and-loading.md` | ~297 | Research: how Pi discovers, loads, caches, and runs extensions |
-| `miscelaneous_documentation/explore-discover/event-logger-extension-setup/event-logger-extension-setup.md` | this file | This report |
+| `documented_lessons/01-extension-discovery-and-loading.md` | ~297 | Research: how Pi discovers, loads, caches, and runs extensions |
+| `documented_lessons/event-logger-extension-setup/event-logger-extension-setup.md` | this file | This report |
 
 ---
 

@@ -51,4 +51,14 @@ export default function (pi: ExtensionAPI) {
     log(`  cwd: ${ctx.cwd}`);
     log(`  mode: ${ctx.mode}`);
   });
+
+  /**
+   * session_info_changed — fires when the session name is set or cleared.
+   * - event.name: the new name (string), or undefined if cleared
+   */
+  pi.on("session_info_changed", async (event, ctx) => {
+    log(`EVENT: session_info_changed`);
+    log(`  name: ${event.name ?? "(cleared)"}`);
+    log(`  sessionFile: ${ctx.sessionManager.getSessionFile() ?? "none"}`);
+  });
 }

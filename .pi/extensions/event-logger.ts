@@ -61,4 +61,17 @@ export default function (pi: ExtensionAPI) {
     log(`  name: ${event.name ?? "(cleared)"}`);
     log(`  sessionFile: ${ctx.sessionManager.getSessionFile() ?? "none"}`);
   });
+
+  /**
+   * session_before_switch — fires before switching to another session.
+   * - event.reason: "new" | "resume"
+   * - event.targetSessionFile: the session file being switched TO
+   * Can be cancelled by returning { cancel: true }
+   */
+  pi.on("session_before_switch", async (event, ctx) => {
+    log(`EVENT: session_before_switch`);
+    log(`  reason: ${event.reason}`);
+    log(`  targetSessionFile: ${event.targetSessionFile ?? "none"}`);
+    log(`  currentSessionFile: ${ctx.sessionManager.getSessionFile() ?? "none"}`);
+  });
 }

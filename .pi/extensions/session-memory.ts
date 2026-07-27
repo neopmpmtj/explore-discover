@@ -17,23 +17,20 @@ import { join } from "node:path";
 const SUMMARIES_DIR = join(import.meta.dirname, "..", "..", "session-summaries");
 
 /**
- * OpenAI API key — read from Pi's secrets file.
+ * DeepSeek API key — read from Pi's secrets file.
  * The .env is at ~/.pi/agent/.env and sourced by the Pi launcher.
  * We try process.env first, then fall back to reading the file directly.
  */
 function getApiKey(): string | undefined {
   // Try environment variable first (sourced by Pi wrapper)
-  if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
+  if (process.env.DEEPSEEK_API_KEY) return process.env.DEEPSEEK_API_KEY;
 
   // Fallback: read the .env file directly
   try {
-    const envPath = join(import.meta.dirname, "..", "..", "..", "..", "..", ".env");
-    // That won't work — the .env is at ~/.pi/agent/.env
-    // Let's try a known location
     const homeEnv = join(process.env.HOME || "/home/pmpmt", ".pi", "agent", ".env");
     if (existsSync(homeEnv)) {
       const content = readFileSync(homeEnv, "utf-8");
-      const match = content.match(/OPENAI_API_KEY=(.+)/);
+      const match = content.match(/DEEPSEEK_API_KEY=(.+)/);
       if (match) return match[1].trim();
     }
   } catch {
@@ -61,7 +58,7 @@ const SUMMARY_PROMPT = `You are a session memory archivist. Your task is to crea
 Format your summary in clear, scannable markdown so it can be used as memory recall in future sessions.`;
 
 /**
- * Call the OpenAI API to generate a summary.
+ * Call the DeepSeek API to generate a summary.
  */
 async function generateSummary(messages: Array<{ role: string; content: string }>): Promise<string | null> {
   const apiKey = getApiKey();
@@ -85,14 +82,14 @@ async function generateSummary(messages: Array<{ role: string; content: string }
   chatMessages.push({ role: "user", content: "Please summarize the above conversation now." });
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "deepseek-v4-flash",
         messages: chatMessages,
         max_tokens: 1000,
         temperature: 0.3,

@@ -2,7 +2,8 @@
  * session-memory.ts — Phase 1: Data Gathering Pipeline
  *
  * Captures raw session data whenever we leave via /new, /fork, or quit.
- * Saves all messages to a timestamped JSON file in session-summaries/.
+ * Uses the session ID (from the sessionFile path) as the filename — same
+ * session always writes to the same file, so quit/resume doesn't duplicate.
  *
  * Phase 2 (LLM summarization) is handled by the standalone summarizer:
  *   session-summarizer/summarize.mjs
@@ -11,7 +12,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, basename } from "node:path";
 
 /**
  * Where to save session snapshots.
@@ -38,15 +39,23 @@ function captureSession(manager: any, reason: string) {
 
   const sessionFile = manager.getSessionFile() ?? "unknown";
   const sessionName = manager.getSessionName() ?? "unnamed";
-
   const now = new Date();
-  const ts = now.toISOString().replace(/T/, "_").replace(/\..+/, "").replace(/:/g, "-");
-  const filepath = join(SUMMARIES_DIR, `${ts}_${reason}.json`);
+
+  // Use the session's creation timestamp + ID as a stable filename.
+  // Same session always maps to the same file — no duplicates on quit/resume.
+  // Example sessionFile: .../2026-07-29T15-36-34-994Z_019fae85-3bb2-....jsonl
+  // Extracts:            2026-07-29T15-36-34-994Z_019fae85-3bb2-...
+  const sessionId = sessionFile !== "unknown"
+    ? basename(sessionFile, ".jsonl")
+    : `unknown_${now.toISOString().replace(/T/, "_").replace(/\..+/, "").replace(/:/g, "-")}`;
+
+  const filepath = join(SUMMARIES_DIR, `${sessionId}_${reason}.json`);
 
   const data = {
     sessionName,
     sessionFile,
     reason,
+    // Include the capture timestamp so we can see when this snapshot was taken
     capturedAt: now.toISOString(),
     messageCount: messages.length,
     summary: null,

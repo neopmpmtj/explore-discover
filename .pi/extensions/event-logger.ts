@@ -94,5 +94,18 @@ export default function (pi: ExtensionAPI) {
     if (event.messages.length > 5) {
       log(`  ... (${event.messages.length - 5} more messages)`);
     }
+
+    // ── Full-message version (uncomment to see ALL messages): ──
+    // pi.on("context", async (event, ctx) => {
+    //   log(`EVENT: context`);
+    //   log(`  messageCount: ${event.messages.length}`);
+    //   for (let i = 0; i < event.messages.length; i++) {
+    //     const m = event.messages[i] as any;
+    //     const preview = typeof m.content === "string"
+    //       ? m.content.slice(0, 500)
+    //       : JSON.stringify(m.content).slice(0, 500);
+    //     log(`  [${i}] ${m.role}: ${preview}`);
+    //   }
+    // });
   });
 }

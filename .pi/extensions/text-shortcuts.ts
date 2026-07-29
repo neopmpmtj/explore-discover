@@ -28,14 +28,12 @@ const SHORTCUTS: Record<string, string> = {
   "::review": "Review this code for bugs, edge cases, and improvements. List findings in order of importance.",
   "::docs": "Write clear documentation for the changes made in this session. Use the document.md prompt format.",
   "::summarize": "Summarize the conversation so far. Only the key decisions, problems solved, and next steps.",
-  "::help": "__HELP__", // special: handled below
 };
 
 export default function (pi: ExtensionAPI) {
   // Show shortcuts on startup — this popup works the same as observability's
   pi.on("session_start", async (_event, ctx) => {
     const list = Object.keys(SHORTCUTS)
-      .filter(k => k !== "::help")
       .map(k => `  ${k} → ${SHORTCUTS[k].slice(0, 40)}...`)
       .join("\n");
     ctx.ui.notify(`Shortcuts loaded:\n${list}`, "info");
@@ -52,17 +50,6 @@ export default function (pi: ExtensionAPI) {
         // Keep anything after the shortcut (like @file references)
         const rest = text.slice(key.length).trim();
         const expanded = rest ? `${replacement}\n\nRefer to: ${rest}` : replacement;
-
-        if (key === "::help") {
-          const list = Object.entries(SHORTCUTS)
-            .filter(([k]) => k !== "::help")
-            .map(([k, v]) => `  **${k}** → ${v.slice(0, 80)}...`)
-            .join("\n");
-          // Give the AI the full list so it can display it directly
-          event.text = `The user typed ::help. Display these shortcuts to them (no extra commentary, just the list):\n${list}`;
-          log("displayed help");
-          return;
-        }
 
         event.text = expanded;
         log(`expanded "${key}" → ${expanded.length} chars`);

@@ -6,6 +6,8 @@
  *
  * Phase 2 (LLM summarization) is handled by the standalone summarizer:
  *   session-summarizer/summarize.mjs
+ *
+ * NOTE: This is the data capture layer only — no AI calls here.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";

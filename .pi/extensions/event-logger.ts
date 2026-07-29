@@ -74,4 +74,16 @@ export default function (pi: ExtensionAPI) {
     log(`  targetSessionFile: ${event.targetSessionFile ?? "none"}`);
     log(`  currentSessionFile: ${ctx.sessionManager.getSessionFile() ?? "none"}`);
   });
+
+  /**
+   * context — fires before each LLM call. Can modify messages.
+   * - event.messages: all messages being sent (mutable array)
+   * Messages are too large to log in full, so we log role summary.
+   */
+  pi.on("context", async (event, ctx) => {
+    const roles = event.messages.map((m: any) => m.role);
+    log(`EVENT: context`);
+    log(`  messageCount: ${event.messages.length}`);
+    log(`  roles: ${roles.join(" → ")}`);
+  });
 }

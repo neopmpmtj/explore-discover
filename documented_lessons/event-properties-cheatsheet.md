@@ -289,24 +289,53 @@ Built-in tool names: `"bash"`, `"read"`, `"edit"`, `"write"`, `"grep"`, `"find"`
 
 ## The `ctx` Object (available in every handler)
 
-Not on `event.*`, but available as the second parameter. Key properties:
+`ctx` stands for **context** — a toolbox Pi hands you when your event fires. Same object, every handler.
 
-| Property | Type | Meaning |
+### 📊 Dashboard — Read what's happening
+
+| Property | Type | What it tells you |
 |---|---|---|
-| `ctx.cwd` | `string` | Current working directory |
-| `ctx.mode` | `"tui"` / `"rpc"` / `"json"` / `"print"` | How Pi is running |
-| `ctx.hasUI` | `boolean` | Can we show dialogs? (true in TUI and RPC) |
-| `ctx.isIdle()` | `boolean` | Is the agent not streaming? |
-| `ctx.isProjectTrusted()` | `boolean` | Is the project trusted? |
-| `ctx.abort()` | function | Abort the current agent operation |
-| `ctx.shutdown()` | function | Gracefully exit Pi |
-| `ctx.getContextUsage()` | object or undefined | Token usage (tokens, contextWindow, percent) |
-| `ctx.compact(...)` | function | Trigger compaction |
-| `ctx.getSystemPrompt()` | string | Current system prompt |
-| `ctx.ui` | object | UI methods (select, confirm, input, notify, etc.) |
-| `ctx.model` | object or undefined | Current model info |
-| `ctx.signal` | `AbortSignal` or undefined | Current abort signal |
-| `ctx.sessionManager` | object (read-only) | Session metadata |
+| `ctx.cwd` | `string` | Project folder path |
+| `ctx.mode` | `"tui"` \| `"rpc"` \| `"json"` \| `"print"` | How Pi is running |
+| `ctx.hasUI` | `boolean` | Can we show popups/dialogs? |
+| `ctx.sessionManager` | `ReadonlySessionManager` | Session data (name, file, messages) |
+| `ctx.model` | `Model \| undefined` | Which AI model is active |
+| `ctx.thinkingLevel` | `ThinkingLevel \| undefined` | How much thinking the AI does |
+| `ctx.signal` | `AbortSignal \| undefined` | Is the agent running? (`undefined` = idle) |
+
+### 🧰 Toolkit — Interact with the user
+
+| Method | What it does |
+|---|---|
+| `ctx.ui.notify(msg, type)` | Show popup (type: `"info"` \| `"warning"` \| `"error"`) |
+| `ctx.ui.select(choices)` | Ask user to pick from a list |
+| `ctx.ui.confirm(question)` | Yes/no popup |
+| `ctx.ui.input(prompt)` | Ask user to type something |
+
+### 🕹️ Control Panel — Tell Pi what to do
+
+| Method | What it does |
+|---|---|
+| `ctx.isIdle()` | Is the agent done streaming? |
+| `ctx.abort()` | Stop the current agent immediately |
+| `ctx.shutdown()` | Quit Pi gracefully |
+| `ctx.compact(options?)` | Squeeze conversation to save tokens |
+| `ctx.getContextUsage()` | Token usage stats (tokens, contextWindow, percent) |
+| `ctx.getSystemPrompt()` | What's the current system prompt? |
+| `ctx.hasPendingMessages()` | Any messages queued? |
+| `ctx.isProjectTrusted()` | Has the user trusted this project? |
+
+### ⭐ Command-only (Extended context)
+
+Only available in slash command handlers, not regular event handlers:
+
+| Method | What it does |
+|---|---|
+| `ctx.waitForIdle()` | Wait for agent to finish streaming |
+| `ctx.newSession(options?)` | Start a new session programmatically |
+| `ctx.fork(entryId, options?)` | Fork from a specific message |
+| `ctx.navigateTree(targetId, options?)` | Jump to a different point in the tree |
+| `ctx.getSystemPromptOptions()` | Get system prompt construction config |
 
 ---
 

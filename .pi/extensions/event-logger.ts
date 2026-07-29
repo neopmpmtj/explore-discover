@@ -78,12 +78,17 @@ export default function (pi: ExtensionAPI) {
   /**
    * context — fires before each LLM call. Can modify messages.
    * - event.messages: all messages being sent (mutable array)
-   * Messages are too large to log in full, so we log role summary.
+   * TEMP: logging full messages to see detail.
    */
   pi.on("context", async (event, ctx) => {
-    const roles = event.messages.map((m: any) => m.role);
     log(`EVENT: context`);
     log(`  messageCount: ${event.messages.length}`);
-    log(`  roles: ${roles.join(" → ")}`);
+    for (let i = 0; i < event.messages.length; i++) {
+      const m = event.messages[i] as any;
+      const preview = typeof m.content === "string"
+        ? m.content.slice(0, 500)
+        : JSON.stringify(m.content).slice(0, 500);
+      log(`  [${i}] ${m.role}: ${preview}`);
+    }
   });
 }

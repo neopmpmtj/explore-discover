@@ -5,51 +5,17 @@
  * Use this to see exactly what happens when you send a message.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 
 const LOG_FILE = join(import.meta.dirname, "..", "events.log");
-const OBS_DIR = join(import.meta.dirname, "..", "observability");
-const ERRORS_FILE = join(OBS_DIR, "errors.jsonl");
 
 function log(msg: string) {
   const timestamp = new Date().toISOString();
   appendFileSync(LOG_FILE, `[${timestamp}] ${msg}\n`);
 }
 
-function recordError(type: string, error: Error | unknown) {
-  mkdirSync(OBS_DIR, { recursive: true });
-  const err = error instanceof Error ? error : new Error(String(error));
-  const stack = err.stack ? err.stack.split("\n").map((s) => s.trim()) : [];
-  appendFileSync(ERRORS_FILE, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    type,
-    message: err.message,
-    stack,
-    nodeVersion: process.version,
-  }) + "\n");
-}
-
 export default function (pi: ExtensionAPI) {
-  // ── Crash traps ───────────────────────────────────────────────────────
-
-  // Write a marker so we know the crash traps are set up
-  mkdirSync(OBS_DIR, { recursive: true });
-  appendFileSync(ERRORS_FILE, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    type: "init",
-    message: "Crash traps registered",
-  }) + "\n");
-
-  process.on("uncaughtException", (error) => {
-    recordError("uncaughtException", error);
-    log(`💥 CRASH: ${error.message}`);
-  });
-
-  process.on("unhandledRejection", (reason) => {
-    recordError("unhandledRejection", reason);
-    log(`⚠ UNHANDLED: ${reason instanceof Error ? reason.message : String(reason)}`);
-  });
   // ── Conveyor belt: what happens every time you send a message ──
 
   pi.on("input", async (event, ctx) => {

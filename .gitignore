@@ -1,0 +1,15 @@
+# Session data (contains full conversations — may include secrets)
+sessions/
+session-summaries/
+sessions-memory/
+
+# Extension logs
+.pi/events.log
+.pi/session-memory-debug.log
+
+# Summarizer state
+session-summarizer/summarizer-state.json
+session-summarizer/summarizer.log
+
+# Node (if added later)
+node_modules/

@@ -78,17 +78,21 @@ export default function (pi: ExtensionAPI) {
   /**
    * context — fires before each LLM call. Can modify messages.
    * - event.messages: all messages being sent (mutable array)
-   * TEMP: logging full messages to see detail.
+   * Logs first 5 messages to avoid flooding the log.
    */
   pi.on("context", async (event, ctx) => {
     log(`EVENT: context`);
     log(`  messageCount: ${event.messages.length}`);
-    for (let i = 0; i < event.messages.length; i++) {
+    const limit = Math.min(5, event.messages.length);
+    for (let i = 0; i < limit; i++) {
       const m = event.messages[i] as any;
       const preview = typeof m.content === "string"
-        ? m.content.slice(0, 500)
-        : JSON.stringify(m.content).slice(0, 500);
+        ? m.content.slice(0, 300)
+        : JSON.stringify(m.content).slice(0, 300);
       log(`  [${i}] ${m.role}: ${preview}`);
+    }
+    if (event.messages.length > 5) {
+      log(`  ... (${event.messages.length - 5} more messages)`);
     }
   });
 }

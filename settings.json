@@ -3,5 +3,8 @@
   "defaultModel": "deepseek-v4-pro",
   "defaultThinkingLevel": "high",
   "theme": "dark",
-  "lastChangelogVersion": "0.82.1"
+  "lastChangelogVersion": "0.82.1",
+  "packages": [
+    "npm:pi-web-access"
+  ]
 }

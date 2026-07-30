@@ -29,10 +29,26 @@ But this tool doesn't exist yet — it would need to be built as an extension.
 
 ## 🔜 Tutoring Plan
 
-1. Understand the `registerTool` API — how extensions add custom tools the AI can call
-2. Understand `pi.exec()` — how extensions can run shell commands (including spawning Pi itself)
-3. Build a simple `subagent` tool extension
-4. Test it: orchestrator → subagent → report back
+1. ~~Understand the `registerTool` API~~ — skipped: found an existing package
+2. Install `@mjakl/pi-subagent` via `pi install npm:@mjakl/pi-subagent`
+3. Configure it — link the global orchestrator to sub-agents we create
+4. Test: orchestrator → subagent → report back
+
+## Research: `@mjakl/pi-subagent` v2.1.0
+
+From npm/GitHub search:
+- Enables subagent delegation for Pi
+- Uses `spawn` or `fork` context modes
+- Features: auto-discovery of agents, depth & cycle guards, streaming updates, parallel execution
+- Security: confirmation prompt for project-local agents
+- Install: `pi install npm:@mjakl/pi-subagent` or `npm i @mjakl/pi-subagent`
+
+## Decision point
+
+**Option A:** Install the package (quick, feature-rich, stable)
+**Option B:** Build our own simpler version (educational, more control, less features)
+
+Which path?
 
 ---
 

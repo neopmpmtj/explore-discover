@@ -340,3 +340,88 @@ Only available in slash command handlers, not regular event handlers:
 ---
 
 > **Tip:** Events marked "(can cancel)" let you return `{ cancel: true }` to stop the action. Events marked "(can modify)" let you return an object to change behavior. Others just let you observe.
+
+---
+
+## Modifiable Nested Properties
+
+Some events have sub-properties you can modify in-place. Here's every available nested property organized by event.
+
+### `before_agent_start` — `event.systemPromptOptions`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `.customPrompt` | `string?` | Replace the ENTIRE system prompt |
+| `.selectedTools` | `string[]?` | Which tools to list in section 2 |
+| `.toolSnippets` | `Record<string, string>?` | One-line tool descriptions |
+| `.promptGuidelines` | `string[]?` | Extra bullets in section 4 (guidelines) |
+| `.appendSystemPrompt` | `string?` | Text appended at section 6 |
+| `.cwd` | `string` | Working directory |
+| `.contextFiles` | `Array<{path, content}>?` | Files shown in section 7 |
+| `.skills` | `Skill[]?` | Skills shown in section 8 |
+
+Also available: **`event.systemPrompt`** — the full built string (all 9 sections). Can prepend/append/replace entirely.
+
+### `context` — `event.messages`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `[index].role` | `string` | Message role (`"user"`, `"assistant"`, `"toolResult"`) |
+| `[index].content` | `string \| array` | Message content (text or content blocks) |
+
+Array is mutable — use `.push()`, `.pop()`, `.filter()`, `.splice()`, or reassign.
+
+### `before_provider_request` — `event.payload`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `.model` | `string` | Model name (e.g. `"deepseek-v4-pro"`) |
+| `.max_tokens` | `number` | Max output tokens |
+| `.temperature` | `number` | Randomness (0 = deterministic) |
+| `.messages` | `array` | Message array being sent |
+
+Note: `event.payload` is typed as `unknown`. Cast with `as any` to access fields.
+
+### `before_provider_headers` — `event.headers`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `[key]` | `string` | Any HTTP header — set to `null` to delete |
+
+Mutate in place: `event.headers["X-My-Header"] = "value"`.
+
+### `input` — `event.text`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `.text` | `string` | User's input — replace to transform what Pi sees |
+
+### `tool_call` — `event.input` (varies by tool)
+
+| Tool | Sub-properties |
+|---|---|
+| `"bash"` | `.command` (string), `.timeout` (number, optional) |
+| `"read"` | `.path` (string), `.offset` (number, optional), `.limit` (number, optional) |
+| `"edit"` | `.path` (string), `.edits` (array of `{oldText, newText}`) |
+| `"write"` | `.path` (string), `.content` (string) |
+| `"grep"` | `.pattern` (string), `.path` (string, optional) |
+| `"find"` | `.pattern` (string), `.path` (string, optional) |
+| `"ls"` | `.path` (string, optional) |
+
+Mutate in place: `event.input.command = "fixed command"`.
+
+### `tool_result` — `event.content`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `[index].type` | `"text"` \| `"image"` | Content block type |
+| `[index].text` | `string?` | Text content (if type = "text") |
+
+Also available: `event.isError` (boolean, can set to override error status).
+
+### `user_bash` — `event.command`
+
+| Sub-property | Type | What it does |
+|---|---|---|
+| `.command` | `string` | The shell command — replace to change what runs |
+

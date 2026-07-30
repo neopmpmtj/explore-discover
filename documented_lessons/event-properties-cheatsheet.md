@@ -4,7 +4,86 @@ Every event handler receives `(event, ctx)`. Here's what's available on `event.*
 
 ---
 
-## Session Events
+## Extension API — Three ways to build
+
+How you register code with Pi. The `pi` object is the `ExtensionAPI`.
+
+### `pi.on(event, handler)` — Background worker
+
+Fires automatically when events happen. Does NOT show as a command.
+
+```typescript
+pi.on("tool_call", async (event, ctx) => { ... });
+pi.on("session_start", async (event, ctx) => { ... });
+```
+
+**Use for:** observers, guards, transformers — anything that runs in the background.
+
+### `pi.registerCommand(name, options)` — Slash command
+
+Shows as `/name` in Pi. Runs your handler when the user invokes it.
+
+```typescript
+pi.registerCommand("save-memory", {
+  description: "Summarize current session",
+  handler: async (args, ctx) => { ... },  // ctx is ExtensionCommandContext
+});
+```
+
+**Use for:** user-triggered actions — git commits, summarizers, one-click workflows.
+ctx includes extras: `waitForIdle()`, `newSession()`, `fork()`, `getSystemPromptOptions()`.
+
+### `pi.registerTool(options)` — AI-callable tool
+
+Adds a tool the **AI can decide to call** with specific parameters. Like `read`, `bash`, `edit`.
+
+```typescript
+pi.registerTool({
+  name: "calculator",
+  label: "Calculator",
+  description: "Evaluate a math expression",
+  parameters: Type.Object({ expression: Type.String() }),
+  async execute(_toolCallId, params, signal, onUpdate, ctx) {
+    // params.expression is typed
+    const result = eval(params.expression); // or use a safe parser
+    return { content: [{ type: "text", text: String(result) }] };
+  },
+});
+```
+
+**Use for:** giving the AI new capabilities — web search, subagents, calculators, API callers.
+Parameters use TypeBox schemas for type safety.
+
+### `pi.exec(command, args, options?)` — Run shell commands
+
+Run a shell command from inside an extension. Returns `{ stdout, stderr, code, killed }`.
+
+```typescript
+const result = await pi.exec("git", ["add", "-A"], { cwd: ctx.cwd });
+if (result.code === 0) { /* success */ }
+```
+
+Options: `{ cwd, timeout, signal }`. Safer than `child_process.spawn` — sandboxed and Pi-aware.
+Use `child_process.spawn` directly only when you need streaming (like the subagent runner does).
+
+### `pi.registerFlag(name, options)` — CLI flag
+
+Adds a `--my-flag` option to Pi's CLI.
+
+```typescript
+pi.registerFlag("subagent-max-depth", {
+  description: "Max delegation depth (default: 3)",
+  type: "string",
+});
+```
+
+### `pi.registerShortcut(shortcut, options)` — Keyboard shortcut
+
+Binds a keyboard key to a handler.
+
+---
+
+## Event Properties
 
 ### `session_start`
 

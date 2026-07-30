@@ -292,4 +292,17 @@ Conflicts don't prevent loading — Pi reports them as diagnostics and continues
 
 ## Next
 
-**Topic 2: Event Lifecycle** — Now that we know how extensions are loaded, we need to understand the 32 events they can hook into. This covers the full lifecycle from startup through the agent loop to shutdown.
+**Topic 2: Commands** — Prompt files vs registered commands (`/document` vs `/commit`). See `02-commands.md`.
+
+---
+
+## 8. Pi Packages
+
+Pi packages are npm packages that contain extensions, skills, prompts, or themes. They're discovered via:
+- The `"pi-package"` keyword in `package.json`
+- A `pi.extensions` field pointing to extension entry points
+- Global installation in `~/.pi/agent/npm/node_modules/`
+
+Example: `pi-agent-browser-native` (v0.2.72) provides `web_search` and `agent_browser` tools. It's installed globally and auto-discovered.
+
+To share extensions across multiple agent identities (like our `explore-discover` agent), copy the compiled JS + lib directory to `.pi/extensions/`. For proper use, install via `pi install npm:package-name`.

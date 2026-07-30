@@ -151,3 +151,60 @@ Pi's native session format (JSONL tree)
 **Key insight:** Our `session-memory.ts` and `summarize.mjs` are a MANUAL version
 of what Pi does automatically with compaction. The difference: our system saves
 the FULL context (not just the summary), which is better for future vector database retrieval.
+
+## Compaction prompts (read-only — do not modify)
+
+Pi's compaction uses these hardcoded prompts. They live in Pi's installation files
+and would be overwritten on update. View them to understand what Pi does under the hood.
+
+**System prompt:**
+`/home/pmpmt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/utils.js`
+
+```
+You are a context summarization assistant. Your task is to read a conversation
+between a user and an AI assistant, then produce a structured summary following
+the exact format specified.
+
+Do NOT continue the conversation. Do NOT respond to any questions in the
+conversation. ONLY output the structured summary.
+```
+
+**Main compaction prompt:**
+`/home/pmpmt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js` (line 356)
+
+```
+The messages above are a conversation to summarize. Create a structured
+context checkpoint summary that another LLM will use to continue the work.
+
+Use this EXACT format:
+
+## Goal
+[What is the user trying to accomplish?]
+
+## Constraints & Preferences
+- [...]
+
+## Progress
+### Done
+- [x] [Completed tasks]
+### In Progress
+- [ ] [Current work]
+### Blocked
+- [Issues preventing progress]
+
+## Key Decisions
+- **[Decision]**: [Brief rationale]
+
+## Next Steps
+1. [Ordered list]
+
+## Critical Context
+- [File paths, error messages, data needed to continue]
+```
+
+**Update prompt** (when a previous summary already exists):
+Same file, line 388 — merges new messages into existing summary, preserving old info.
+
+> ⚠️ **Do not edit Pi's installation files.** These prompts are read-only reference.
+> To customize compaction, use the `session_before_compact` event in an extension
+> (provides `event.customInstructions`).

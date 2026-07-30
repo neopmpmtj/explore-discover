@@ -104,12 +104,35 @@ Access the current theme via the second argument in `ctx.ui.custom()`:
 
 ```typescript
 const result = await ctx.ui.custom((tui, theme, keybindings, done) => {
-  const coloredText = theme.fg("error", "Something went wrong");
+  const coloredText = theme.fg("success", "Task completed!");
   return new Text(coloredText, 1, 1);
 });
 ```
 
-Theme methods: `fg(color, text)`, `bg(color, text)`, `bold(text)`, `dim(text)`.
+**Available foreground colors (`theme.fg`):**
+
+| Category | Colors |
+|---|---|
+| General | `"text"`, `"accent"`, `"muted"`, `"dim"` |
+| Semantic | `"success"` (green), `"error"` (red), `"warning"` (yellow) |
+| Messages | `"userMessageText"`, `"customMessageText"`, `"customMessageLabel"` |
+| Tools | `"toolTitle"`, `"toolOutput"` |
+| Syntax | `"syntaxComment"`, `"syntaxKeyword"`, `"syntaxString"`, `"syntaxNumber"`, etc. |
+| Thinking | `"thinkingOff"`, `"thinkingLow"`, `"thinkingMedium"`, `"thinkingHigh"` |
+| Diff | `"toolDiffAdded"`, `"toolDiffRemoved"`, `"toolDiffContext"` |
+
+**Available background colors (`theme.bg`):**
+
+| Color | Where used |
+|---|---|
+| `"selectedBg"` | Selected items |
+| `"userMessageBg"` | User messages |
+| `"customMessageBg"` | Custom entries |
+| `"toolPendingBg"` | Tool in progress |
+| `"toolSuccessBg"` | Tool succeeded |
+| `"toolErrorBg"` | Tool failed |
+
+Usage: `theme.bg("toolPendingBg", theme.fg("accent", "Working..."))`
 
 ---
 

@@ -1,0 +1,125 @@
+# 06 — TUI Components
+
+## What they are
+
+Extensions can render **custom UI inside Pi's terminal**. Beyond popups (`ctx.ui.notify()`) and dialogs (`ctx.ui.confirm()`), you can build:
+- Custom panels, sidebars, overlays
+- Color-coded message rendering
+- Interactive selectors, inputs, custom displays
+
+## Source
+
+All components come from the `@earendil-works/pi-tui` package, included in Pi's installation:
+`/home/pmpmt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-tui/`
+
+Documentation: `/home/pmpmt/.nvm/versions/node/v24.18.0/lib/node_modules/@earendil-works/pi-coding-agent/docs/tui.md`
+
+## Core concept: the Component interface
+
+Every TUI element implements this interface:
+
+```typescript
+interface Component {
+  render(width: number): string[];  // Return lines (each ≤ width)
+  handleInput?(data: string): void;  // Receive keyboard input
+  wantsKeyRelease?: boolean;        // Kitty keyboard protocol
+  invalidate(): void;               // Clear render cache
+}
+```
+
+You `render()` your component line-by-line. Pi calls `handleInput()` for keyboard events.
+
+## Built-in components
+
+Import from `@earendil-works/pi-tui`:
+
+| Component | What it does |
+|---|---|
+| `Text(content, padX, padY, bgFn?)` | Multi-line text with wrapping |
+| `Box(padX, padY, bgFn)` | Container with padding & background |
+| `Container()` | Groups children vertically |
+| `Spacer(lines)` | Empty vertical space |
+| `Markdown(text, padX, padY, theme)` | Renders markdown with syntax highlighting |
+| `Image(base64, mimeType, theme, opts)` | Renders images (Kitty/iTerm2 terminals) |
+
+## Using custom components: `ctx.ui.custom()`
+
+Create interactive components within extensions or tools:
+
+```typescript
+const result = await ctx.ui.custom<string | null>(
+  (tui, theme, keybindings, done) =>
+    new MyComponent({
+      theme,
+      keybindings,
+      onChange: () => tui.requestRender(),
+      onSelect: (value) => done(value),
+      onCancel: () => done(null),
+    })
+);
+```
+
+**Parameters:**
+- `tui` — the TUI instance (for `requestRender()`)
+- `theme` — current theme (colors, styles)
+- `keybindings` — registered keybindings
+- `done(value)` — call to close the component and return a result
+
+## Overlays
+
+Render on top of existing content:
+
+```typescript
+const result = await ctx.ui.custom<string | null>(
+  (tui, theme, keybindings, done) => new SidePanel({ onClose: done }),
+  { overlay: true }
+);
+```
+
+Positioning: anchor (`"top-left"` through `"center"`), offset, margin, responsive visibility.
+
+## Registering custom renderers
+
+### Message renderer — customize how messages look
+
+```typescript
+pi.registerMessageRenderer("myCustomType", (message, options, theme) => {
+  // Return a Component that renders the message
+  return new Box(1, 1, theme.bg("infoBg"))
+    .addChild(new Text(`[${message.customType}] ${message.display}`, 0, 0));
+});
+```
+
+### Entry renderer — customize session entries in /tree
+
+```typescript
+pi.registerEntryRenderer("myCustomType", (entry, options, theme) => {
+  return new Text(`📌 ${entry.metadata.summary}`, 0, 0);
+});
+```
+
+## Styles and themes
+
+Access the current theme via the second argument in `ctx.ui.custom()`:
+
+```typescript
+const result = await ctx.ui.custom((tui, theme, keybindings, done) => {
+  const coloredText = theme.fg("error", "Something went wrong");
+  return new Text(coloredText, 1, 1);
+});
+```
+
+Theme methods: `fg(color, text)`, `bg(color, text)`, `bold(text)`, `dim(text)`.
+
+---
+
+## 🔜 Tutoring Plan
+
+1. Read the full docs at `docs/tui.md`
+2. Build a custom message renderer — color-code messages by role
+3. (Optional) Build an overlay panel
+4. (Optional) Register a custom entry renderer for our session-memory entries
+
+---
+
+*(This document will grow as we explore TUI components.)*

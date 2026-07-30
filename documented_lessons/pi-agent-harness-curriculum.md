@@ -49,10 +49,7 @@ session-summaries/*.json   →    sessions-memory/*.summary.md
 - [x] Sub-agents (agent .md files, registerTool, pi.exec)
 - [x] Safety guard (blocking dangerous commands)
 - [x] Memory pipeline (capture + summarize)
-
-### In Progress 🔜
-
-- [ ] Session management — tree structure, branching, compaction internals
+- [x] Session management (JSONL trees, branching, compaction)
 
 ### Still to Explore
 

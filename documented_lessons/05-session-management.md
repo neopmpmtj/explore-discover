@@ -208,3 +208,23 @@ Same file, line 388 — merges new messages into existing summary, preserving ol
 > ⚠️ **Do not edit Pi's installation files.** These prompts are read-only reference.
 > To customize compaction, use the `session_before_compact` event in an extension
 > (provides `event.customInstructions`).
+
+### Compaction events
+
+Two events fire during compaction (from the cheatsheet):
+
+| Event | When | What you can do |
+|---|---|---|
+| `session_before_compact` | Before AI is called to summarize | Cancel (`{ cancel: true }`), inject `customInstructions` |
+| `session_compact` | After summary is saved to JSONL | Read result: summary text, token savings, files referenced |
+
+```
+About to compact? → session_before_compact → CANCEL or customize
+                         │
+                    Compaction runs
+                         │
+                    Done → session_compact → OBSERVE only (too late to stop)
+```
+
+`session_before_compact` is a safety gate — stop it if you want.
+`session_compact` is a notification — it already happened. Read the result.

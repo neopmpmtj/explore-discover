@@ -24,8 +24,8 @@ Quick reference for what's built and where. New session? Start here.
 | `calculator-tool.ts` | `registerTool` | AI can call calculator for math | `pi.registerTool()` |
 | `interactive-guard.ts` | `tool_call` + `user_bash` | Ask yes/no before dangerous commands | `ctx.ui.confirm()` |
 | `save-memory-command.ts` | `registerCommand` | `/save-memory` slash command | `pi.registerCommand()` |
+| `dashboard-command.ts` | `ctx.ui.custom` | `/dashboard` overlay — TUI panel | Overlay, Container, theme |
 | `observability/index.ts` | turn/message events | Token/cost/failure tracking → JSONL | Structured run records |
-| `agent-browser.js` (+ `lib/`) | `registerTool` | `web_search` + `agent_browser` tools | Copied from pi-agent-browser-native |
 
 ## Supporting tools
 

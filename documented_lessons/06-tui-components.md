@@ -136,6 +136,28 @@ Usage: `theme.bg("toolPendingBg", theme.fg("accent", "Working..."))`
 
 ---
 
+## What we built
+
+### `/dashboard` — Extension health overlay
+
+`/home/pmpmt/.pi/explore-discover/.pi/extensions/dashboard-command.ts`
+
+Opens an overlay panel listing all extensions (active/suppressed) and memory pipeline status. Uses `Container`, `Text`, `Spacer`, `Box`, `theme.fg()`, `theme.bg()`, and `ctx.ui.custom({ overlay: true })`.
+
+### Reference: `pi-hud` package (v0.9.5)
+
+A real-world example of advanced TUI customization:
+- Repository: `https://github.com/ludevdot/pi-hud`
+- Persistent right-side overlay or footer mode
+- Uses `ctx.ui.custom({ overlay, overlayOptions: { anchor, width, margin } })` with `OverlayHandle`
+- Live refresh with `setInterval(() => tui.requestRender(), 1000)`
+- Keyboard shortcuts: `pi.registerShortcut()` for hide/show, overlay↔footer
+- Commands: `/hud`, `/hud-mode`, `/hud-settings`
+
+Install: `pi install npm:pi-hud`
+
+---
+
 ## 🔜 Tutoring Plan
 
 1. Read the full docs at `docs/tui.md`

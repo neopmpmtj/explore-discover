@@ -14,6 +14,10 @@ Work through them in order, or jump to a topic that interests you.
 | 3 | System Prompt Composition | [03-system-prompt-composition.md](03-system-prompt-composition.md) | 9 sections, BuildSystemPromptOptions, modifying via extensions |
 | 4 | Sub-Agents | [04-sub-agents.md](04-sub-agents.md) | Agent .md files, spawn vs fork, registerTool, pi.exec, depth/cycle guards |
 | 5 | Session Management | [05-session-management.md](05-session-management.md) | JSONL format, tree structure, branching, compaction, memory pipeline |
+| 6 | TUI Components | [06-tui-components.md](06-tui-components.md) | Overlays, themes, custom components, pi-hud reference |
+| 7 | Discovery Events | [07-discovery-events.md](07-discovery-events.md) | project_trust, resources_discover |
+| 8 | Provider Architecture | [08-provider-architecture.md](08-provider-architecture.md) | pi-ai package, 30+ providers, registerProvider, proxy setup |
+| 9 | Pi Packages | [09-pi-packages.md](09-pi-packages.md) | Bundling extensions for sharing, install, publish |
 
 ## 📋 Reference Documents
 
@@ -50,14 +54,14 @@ session-summaries/*.json   →    sessions-memory/*.summary.md
 - [x] Safety guard (blocking dangerous commands)
 - [x] Memory pipeline (capture + summarize)
 - [x] Session management (JSONL trees, branching, compaction)
+- [x] TUI components (overlays, colors, dashboard panel, pi-hud reference)
+- [x] Discovery events (project_trust, resources_discover)
+- [x] Provider architecture (pi-ai, 30+ providers, registerProvider)
+- [x] Pi packages (bundling, sharing, installing)
 
 ### Still to Explore
 
-- [ ] Discovery events (`file_watched_changed`, `git_branch_changed`)
-- [ ] TUI components (custom panels beyond notifications)
-- [ ] SDK & Programmatic usage (embedding Pi)
-- [ ] Provider architecture (pi-ai package)
-- [ ] Pi packages (creating and distributing)
+- [ ] SDK & Programmatic usage (embedding Pi in apps — advanced)
 
 ## 📖 How to Use This Course
 

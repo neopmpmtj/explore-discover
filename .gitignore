@@ -3,6 +3,11 @@ sessions/
 session-summaries/
 sessions-memory/
 
+# Runtime / reinstallable dependencies (recreated by pi on demand)
+npm/
+bin/
+node_modules/
+
 # Extension logs
 .pi/events.log
 .pi/session-memory-debug.log

@@ -2,7 +2,8 @@
 # setup-pi-agent.sh — Create a new Pi agent identity
 #
 # Usage: ./setup-pi-agent.sh
-# Creates a new agent directory under ~/.pi/ with AGENTS.md, extensions, bash alias.
+# Creates a new agent directory under ~/.pi/partner-agents/ with AGENTS.md,
+# extensions, bash alias, and a git + GitHub (public) backup.
 #
 # Uses everything from our curriculum:
 #   - PI_CODING_AGENT_DIR (agent identities)
@@ -34,7 +35,7 @@ if [ -z "$AGENT_NAME" ]; then
   exit 1
 fi
 
-AGENT_DIR="$HOME/.pi/$AGENT_NAME"
+AGENT_DIR="$HOME/.pi/partner-agents/$AGENT_NAME"
 
 if [ -d "$AGENT_DIR" ]; then
   echo -e "${YELLOW}Warning: $AGENT_DIR already exists.${NC}"
@@ -229,6 +230,59 @@ if [ "$MAKE_ALIAS" = "y" ] || [ "$MAKE_ALIAS" = "Y" ]; then
     echo -e "  ${YELLOW}Run: source ~/.bashrc${NC} (or open a new terminal)"
   fi
 fi
+
+# ── Step 10: Git + GitHub backup ──
+echo ""
+echo -e "${BLUE}Setting up git + GitHub backup...${NC}"
+
+# Canonical .gitignore (excludes sessions, summaries, secrets, runtime deps)
+GITIGNORE_TEMPLATE="$HOME/.pi/agent/partner-agents/gitignore.template"
+if [ -f "$GITIGNORE_TEMPLATE" ]; then
+  cp "$GITIGNORE_TEMPLATE" "$AGENT_DIR/.gitignore"
+else
+  cat > "$AGENT_DIR/.gitignore" << GITIGNOREEOF
+sessions/
+session-summaries/
+sessions-memory/
+.env
+*.key
+*.pem
+npm/
+bin/
+node_modules/
+*.log
+__pycache__/
+GITIGNOREEOF
+fi
+
+# Shared secrets as symlinks — no keys ever enter this repo
+ln -sf "$HOME/.pi/agent/auth.json" "$AGENT_DIR/auth.json"
+ln -sf "$HOME/.pi/agent/models-store.json" "$AGENT_DIR/models-store.json"
+
+# Init + first commit
+if [ ! -d "$AGENT_DIR/.git" ]; then
+  git -C "$AGENT_DIR" init -q -b main
+fi
+git -C "$AGENT_DIR" add -A
+git -C "$AGENT_DIR" commit -q -m "init: $AGENT_NAME partner agent" || echo -e "  ${YELLOW}Nothing to commit yet${NC}"
+
+# Create the public GitHub repo (or reuse an existing one)
+REPO="neopmpmtj/$AGENT_NAME"
+if gh repo view "$REPO" >/dev/null 2>&1; then
+  echo -e "  ${YELLOW}GitHub repo $REPO already exists — wiring remote${NC}"
+  git -C "$AGENT_DIR" remote remove origin 2>/dev/null || true
+  git -C "$AGENT_DIR" remote add origin "https://github.com/$REPO.git"
+else
+  echo -e "  ${GREEN}Creating public repo: $REPO${NC}"
+  gh repo create "$REPO" --public --source "$AGENT_DIR" --push
+fi
+git -C "$AGENT_DIR" push -u origin main 2>/dev/null || true
+
+# Register in the central partner-agent registry (deduped)
+REGISTRY="$HOME/.pi/agent/partner-agents/partner-agents.list"
+touch "$REGISTRY"
+grep -qxF "$AGENT_DIR" "$REGISTRY" || echo "$AGENT_DIR" >> "$REGISTRY"
+echo -e "  ${GREEN}Registered in $REGISTRY${NC}"
 
 # ── Done ──
 echo ""
